@@ -1,0 +1,45 @@
+<h1>Erlang</h1>
+For lesson one, I chose Erlang. In Erlang all variables are immutable. Erlang is know for its ability to handle concurrency and distributed programming. Erlang is structured around a message passing <a href="http://en.wikipedia.org/wiki/Actor_model">actor model</a>.
+
+The functions I wrote convert temperatures between Celsius and Farenheit.
+
+Here's a general example of a basic function:
+
+<pre lang="erlang">
+-module(basic).
+-export([convert_temperature/1]).
+
+convert_temperature({celsius, C}) ->
+  {farenheit, ((C*(9/5))+32)};
+convert_temperature({farenheit, F}) ->
+  {celsius, (5/9)*(F-32)}.
+</pre>
+
+Here's an example of the same function written with threading:
+
+<pre lang="erlang">
+-module(advanced).
+-export([start/0, convert_temperature/1]).
+
+convert_temperature({celsius, C}) ->
+  Out = lists:concat([
+    "The temperature ", 
+    lists:flatten(io_lib:format("~.2f", [float(C)])), 
+    " Celsius is ", 
+    lists:flatten(io_lib:format("~.2f", [float(((C*(9/5))+32))])), 
+    " Farenheit"
+  ]),
+  io:format("~p~n", [Out]);
+convert_temperature({farenheit, F}) ->
+  Out = lists:concat([
+    "The temperature ", 
+    lists:flatten(io_lib:format("~.2f", [float(F)])), 
+    " Farenheit is ", 
+    lists:flatten(io_lib:format("~.2f", [float((5/9)*(F-32))])), 
+    " Celsius"
+  ]),
+  io:format("~p~n", [Out]).
+start() ->
+  spawn(advanced, convert_temperature, [{celsius, 100}]),
+  spawn(advanced, convert_temperature, [{farenheit, 32}]).
+</pre>
